@@ -1,0 +1,59 @@
+Q.1) Create the following database in 3NF using PostgresSQL.
+Consider the following database of Bus-Transport System. Many buses run on one route. Drivers
+are allotted to buses shift-wise.
+Bus (Bus_no int , capacity int , depot_name varchar (20))
+Route (Route_no int, source varchar (20), destination varchar (20), no_of_stations int)
+Driver (Driver_no int, driver_name varchar (20), license_no int, address varchar (20),
+age int , salary float)
+Relationship:
+Bus and Route related with many to one relationship.
+Bus and Driver related with many to many relationship with descriptive attributes, Shift – it can
+be 1 (Morning) or 2 (Evening) and Date_of_duty_allotted.
+Constraints: Primary key, License_no must be unique, Bus capacity should not be null.
+Draw ER diagram and Normalization diagram for above relational schema.
+Using above database solve the following questions.
+A. Create a View
+1. To display details of Bus_no 102 along with details of all drivers who have driven that
+bus.
+2. To display the route details on which buses of capacity 30 runs.
+B. Write a stored function to accept the bus_no and date and print its allotted drivers. Raise
+an exception in case of invalid bus number.
+
+ANS:
+create table route (rno int primary key, src char(20), dest char(20),nos int);
+-------------------------------------------------------------------------------------------------
+create table bus (bno int primary key , cap int not null, depo_name varchar(20) rno int references route); 
+------------------------------------------------------------------------------------------------------
+create table driver (dno int primary key, dname char(20), lic int unique, add char(20), age int , sal float);
+--------------------------------------------------------------------------------------------------
+create table db (bno int references bus on delete cascade, dno int references driver on delete cascade, dduty date, shift text check(shift in ('M','E')));
+
+1. To display details of Bus_no 102 along with details of all drivers who have driven that bus.
+create view v2 as select bus.*,dname from db,driver,bus where driver.dno=db.dno and bus.bno=db.bno and db.bno=102;
+
+2. To display the route details on which buses of capacity 30 runs.
+create view v3 as select bus.* from bus where cap < 30;
+
+B. Write a stored function to accept the bus_no and date and print its allotted drivers. Raise
+an exception in case of invalid bus number.
+
+create or replace function disp_dri(int,date)
+returns void as'
+declare
+rec record;
+b text;
+begin
+select into b bno from bus where bno=$1;
+if (b is null )  then
+raise notice '' Bus No Invalid.....'';
+else
+for rec in select dname from driver,db where driver.dno=db.dno and  bno=$1 and dduty=$2
+loop
+raise notice '' Details of Driver are ....%'', rec.dname;
+end loop;
+end if;
+end;'
+language 'plpgsql';
+-----------------------------------------------------------------------------------------------------------
+Lab=# select disp_dri(101,'2-2-2022');
+NOTICE:   Details of Driver are ....Ram   
