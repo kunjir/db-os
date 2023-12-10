@@ -1,0 +1,48 @@
+Q.1) Create the following database in 3NF using PostgreSQL.
+Consider the following Person–Area database
+Person (pnumber integer, pname varchar (20), birthdate date, income money)
+Area (aname varchar (20), area_type varchar (5))
+An area can have one or more persons living in it, but a person belongs to exactly one area. The
+attribute ‘area_type’ can have values either ‘urban’ or ‘rural’. Create the above database in
+PostgreSQL.
+Draw ER diagram and Normalization diagram for above relational schema.
+Using above database solve the following questions.
+A. Create view
+1. To display details of all the peoples Whose birthday falls in the month of .
+2. List names of people according to area_type having minimum income.
+B. Write a function to print total number of persons of a particular area. (Accept area_name as
+input parameter). Display appropriate message.
+ANS:
+create table Person (pnumber integer primary key, pname varchar (20), birthdate date, income money,aname varchar(20) references Area);
+-----------------------------------------------------------------------------------------------
+create table Area (aname varchar (20) primary key , area_type varchar (5) check (area_type in ('R','U')));
+---------------------------------------------------------
+
+1. To display details of all the peoples Whose birthday falls in the month of .
+create view v3 as select pname from person where to_char(birthdate,'mon')='dec';
+
+2. List names of people according to area_type having minimum income.
+select * from person order by pname;
+select pname from person where aname='Pimpri';
+
+B. Write a function to print total number of persons of a particular area. (Accept area_name as
+input parameter). Display appropriate message.
+ANS:
+create  or replace function tot_person(text)
+returns void as'
+declare
+cnt int;
+a_name alias for $1;
+begin
+select into cnt count(pnumber) from person
+where aname=a_name;
+raise notice ''Total No. of persons are:=%'',cnt;
+end;'
+language 'plpgsql';
+-----------------------------------------------------
+Output
+Lab=# select tot_person('Chakan');
+NOTICE:  Total No. of persons are:=2
+ tot_person 
+------------
+ (1 row)
