@@ -58,14 +58,16 @@ Lab=# select * from ternary;
     1 | 101 |  11
 (1 row)
 
-1. To display names of customers for the ‘Pune’ branch.
+1.> To display names of customers for the ‘Pune’ branch.
 Lab=# select cname from customer,branch,ternary where customer.c_no=ternary.c_no and branch.bid=ternary.bid and brname='pune';
-2.2. To display names of customers who have taken loan from the branch in the same city
+
+2.> To display names of customers who have taken loan from the branch in the same city
 they live.
 
-B. Write a stored function to count number of customers of particular branch. (Accept branch
+B. >Write a stored function to count number of customers of particular branch. (Accept branch
 name as an input parameter).
-ANS: create  or replace function tot_cust(text)
+ANS: 
+create  or replace function tot_cust(text)
 returns void as'
 declare
 cnt int;
