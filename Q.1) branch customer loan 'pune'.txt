@@ -63,6 +63,7 @@ Lab=# select cname from customer,branch,ternary where customer.c_no=ternary.c_no
 
 2.> To display names of customers who have taken loan from the branch in the same city
 they live.
+select cname,bname,bcity fromb,c where bcity=city;
 
 B. >Write a stored function to count number of customers of particular branch. (Accept branch
 name as an input parameter).
