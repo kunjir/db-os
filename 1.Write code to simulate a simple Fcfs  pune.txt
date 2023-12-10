@@ -1,5 +1,6 @@
 1.Write code to simulate a simple FCFS scheduling algorithm for a set of processes.
 Calculate the waiting time and turnaround time for each process.
+
 #include<stdio.h>
 int main()
 {
