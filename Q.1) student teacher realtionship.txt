@@ -1,0 +1,57 @@
+Q.1) Create the following database in 3NF using PostgresSQL.
+Consider the following Student-Teacher database maintained by a college. It also gives
+information of the subject taught by teachers.
+Student (Sno integer, sname varchar (20), sclass varchar (10), saddr varchar(30))
+Teacher (Tno integer, tname varchar (20), qualification char (15), experience integer)
+Relationship: Student-Teacher related with many to many relationship with descriptive
+attribute Subject.
+Constraints: Primary Key, student and teacher name should not be null.
+Draw ER diagram and Normalization diagram for above relational schema.
+Using above database solve the following questions.
+A. Create a View
+1. To display student names who are taught by most experienced teacher.
+2. To display subjects taught by each teacher.
+B. Write a trigger before update a student’s class from student table. Display appropriate
+message.
+ANS:
+1) Create table Student (sno int primary key, s_name char(30), s_class char(10), s_addr
+Char(50));
+2) Create table Teacher (tno int primary key, t_name char (20), qualification char
+(15),experience integer);
+3) Create table ST (sno int references Student, tno int references Teacher, subject text);
+
+1. To display student names who are taught by most experienced teacher.
+ANS:create or replace view v2 as select t_name from teacher where experience=(select max(experience)
+from teacher);
+
+2. To display subjects taught by each teacher.
+ANS:create or replace view v2 as select distinct(t_name), subject from teacher,st where
+teacher.tno=st.tno;
+
+
+B. Write a trigger before update a student’s class from student table. Display appropriate
+message.
+ANS:
+create or replace function befup()
+returns trigger as'
+declare
+begin
+if(new.s_class != old.s_class ) then
+raise Notice '' Student class being Updated'';
+end if;
+return new;
+end;'
+language 'plpgsql';
+
+/*Trigger Code */
+create trigger befup
+before update on student
+for each row
+execute procedure befup();
+
+
+Lab=# update student
+Lab-# set s_class='SYBCA'
+Lab-# where sno=3;
+NOTICE:   Student class being Updated
+UPDATE 1
