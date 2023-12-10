@@ -1,0 +1,28 @@
+Q.2) Write a function to add a request edge between a process and a resource in the graph.
+include <stdio.h>
+
+#include <stdlib.h>
+
+// Structure to represent a node in the graph typedef struct Node {
+
+int id;
+
+int availableResource; struct Edge edge; } Node;
+
+// Structure to represent an edge in the graph typedef struct Edge {
+
+struct Node* sourceNode; struct Node* destinationNode; int weight; struct Edge* nextEdge; } Edge;
+
+// Function to create a new node with given id and available rese Node* createNode(int id, int availableResource) {
+
+Node* newNode (Node*) malloc(sizeof(Node));
+
+newNode->id = id;
+
+newNode->availableResource = availableResource; newNode->edge = NULL;
+
+return newllode;
+
+W
+
+}
