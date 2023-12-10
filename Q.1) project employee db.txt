@@ -1,0 +1,59 @@
+Q.1) Create the following database in 3NF using PostgresSQL.
+Consider the following Project-Employee database, which is managed by a company and stores
+the details of projects assigned to employees.
+Project (Pno int, pname varchar (30), ptype varchar (20), duration integer)
+Employee (Eno integer, ename varchar (20), qualification char (15), joining_date date)
+Relationship:
+Project-Employee related with many-to-many relationship, with descriptive attributes as
+start_date_of_Project, no_of_hours_worked.
+Constraints: Primary key, pname should not be null.
+Draw ER diagram and Normalization diagram for above relational schema.
+Using above database solve the following questions.
+A. Create a View
+1. To display the project name, project type, and project start date, sorted by project start
+date.
+2. To display the name and qualification of the employee, sorted by the employee name.
+B. Write a trigger before inserting joining date into employee table, check joining date
+should be always greater than current date. Display appropriate message.
+
+ANS:
+Create the above database in PostgresSQL
+1) create table PROJECT (pno int primary key, p_name char (30), ptype char(20),duration
+int);
+2) create table EMPLOYEE (eno int primary key, e_name char (20), qualification char (15),
+jdate date);
+3) create table ep (eno int references EMPLOYEE on delete cascade,pno int references
+PROJECT on delete cascade,sdate date,nhw int);
+
+1. To display the project name, project type, and project start date, sorted by project start
+date.
+ANS:
+Lab=# create view proj_disp as
+Lab-# select p_name, ptype,sdate from project,ep where project.pno=ep.pno order by p_name;
+
+2. To display the name and qualification of the employee, sorted by the employee name.
+Lab=# create view v8 as
+Lab-# select e_name,qualification from employee order by e_name;
+
+B. Write a trigger before inserting joining date into employee table, check joining date
+should be always greater than current date. Display appropriate message.
+ANS:
+create or replace function jdate_chk()
+returns trigger as'
+declare
+begin
+-- current_date gives todays date
+if(new.jdate <= current_date) then 
+raise exception ''Joining date should be always greater than current date '';
+else
+raise notice ''Joining date is correct'';
+end if;
+return new;
+end;'
+language 'plpgsql';
+----------------------------------------------------------------------
+/*Trigger Code */
+create trigger t
+before insert on employee
+for each row
+execute procedure jdate_chk();
