@@ -1,0 +1,53 @@
+Q.1) Create the following database in 3NF using PostgreSQL.
+Consider the following Student –Marks database
+Student (Rollno integer, sname varchar (30), address varchar (50), class varchar (10))
+Subject (Scode varchar (10), subject_name varchar (20))
+Relationship:
+Student-Subject related with many-to-many relationship with attributes marks_scored.
+Constraints: Primary key, sname should not be null.
+Draw ER diagram and Normalization diagram for above relational schema.
+Using above database solve the following questions.
+A. Create a View
+1. To display details of students whose name starts with the letter ‘A’.
+2. To display student names, subject and marks who scored less than 40 marks.
+B. Write a trigger to ensure that the marks entered for a student, with respect to a subject is
+never < 0 and greater than 100.
+
+ANS:
+create table stud(rollno int primary key, name varchar(20), address varchar(30), class varchar(10));
+----------------------------------------------------------------------------------------------------------
+create table sub (scode varchar(10) primary key, subject_name varchar(20));
+------------------------------------------------------------------------------------------------------------
+create table ss (rollno int references stud on delete cascade, scode int references sub on delete cascade,ms int);
+
+
+1. To display details of students whose name starts with the letter ‘A’.
+
+2. To display student names, subject and marks who scored less than 40 marks.
+create view v21 as select name,sub_name,ms from stud,ss,sub  where stud.rollno=ss.rollno and sub.scode=ss.scode and ms < 40;
+
+B. Write a trigger to ensure that the marks entered for a student, with respect to a subject is
+never < 0 and greater than 100.
+
+/*Function*/ 
+create or replace function befinsmark()
+returns trigger as'
+declare
+begin
+if((new.ms < 10) or (new.ms > 100)) then
+raise exception '' Marks shd never be less than 10 or greater than 100 ....'';
+end if;
+return new;
+end;'
+language 'plpgsql';
+-------------------------------------------------------
+/*Trigger Code */
+create trigger t5
+before insert on ss
+for each row
+execute procedure befinsmark();
+--------------------------------------------------------
+Lab=# insert into ss values(3,101,2);
+ERROR:   Marks shd never be less than 10 or greater than 100 ....
+Lab=# insert into ss values(3,101,101);
+ERROR:   Marks shd never be less than 10 or greater than 100 ....
