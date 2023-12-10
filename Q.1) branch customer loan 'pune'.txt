@@ -1,0 +1,79 @@
+Q.1) Create the following database in 3NF using PostgreSQL.
+Consider the following Bank database which maintains information about its branches,
+customers and their loan applications.
+Branch (Bid integer, brname varchar (30), brcity varchar (10))
+Customer (Cno integer, cname varchar (20), caddr varchar (35), city varchar (15))
+Loan_application (Lno integer,l_amt_required money,lamtapproved money, l_date date)
+Relationship:
+Branch, Customer, Loan_application are related with ternary relationship as follows:
+Ternary (Bid integer, Cno integer, Lno integer)
+Constraints: Primary key, l_amt_required should be greater than zero.
+Draw ER diagram and Normalization diagram for above relational schema.
+Using above database solve the following questions.
+A. Create a View
+1. To display names of customers for the ‘Pune’ branch.
+2. To display names of customers who have taken loan from the branch in the same city
+they live.
+B. Write a stored function to count number of customers of particular branch. (Accept branch
+name as an input parameter).
+
+ANS:
+1) create table Customer (C_no int primary key, Cname text, Caddress text,   
+   City text);
+
+2) create table Branch (Bid int primary key, brname text, Brcity text);
+
+3) create table LA (Lno int primary key, lamtreq float, lamtapp float, ldate date);
+
+because of ternary relationship craete one more table of relationship.
+
+4)create table ternary(C_no int references Customer on delete cascade, Bid int references Branch on delete cascade, Lno  int references LA on delete cascade);
+
+
+
+
+Lab=# select * from customer;
+ c_no | cname  | caddress |  city  
+------+--------+----------+--------
+    1 | Ramesh | Pimpri   | Pune
+    2 | Ram    | Mumbai   | Mumbai
+(2 rows)
+
+Lab=# select * from branch;
+ bid |    brname    | brcity 
+-----+--------------+--------
+ 101 | Shivajinagar | Pune
+ 102 | Deccan       | Pune
+(2 rows)
+
+Lab=# select * from la;
+ lno | lamtreq | lamtapp |   ldate    
+-----+---------+---------+------------
+  11 |  200000 |  100000 | 2020-02-09
+(1 row)
+
+Lab=# select * from ternary;
+ c_no | bid | lno 
+------+-----+-----
+    1 | 101 |  11
+(1 row)
+
+1. To display names of customers for the ‘Pune’ branch.
+Lab=# select cname from customer,branch,ternary where customer.c_no=ternary.c_no and branch.bid=ternary.bid and brname='pune';
+2.2. To display names of customers who have taken loan from the branch in the same city
+they live.
+
+B. Write a stored function to count number of customers of particular branch. (Accept branch
+name as an input parameter).
+ANS: create  or replace function tot_cust(text)
+returns void as'
+declare
+cnt int;
+b_name alias for $1;
+begin
+select into cnt count(c_no) from branch,ternary where branch.bid=ternary.bid and brname=b_name;
+raise notice ''Total No. of Customers are:= %'',cnt;
+end;'
+language 'plpgsql';
+----------------------------------------------------------------------
+select tot_cust('Aundh');
