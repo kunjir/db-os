@@ -1,0 +1,46 @@
+Q.1) Create the following database in 3NF using PostgresSQL.
+Consider the following Student-Teacher database maintained by a college. It also gives
+information of the subject taught by the teachers.
+Student (Sno integer, sname varchar (20), sclass varchar (10), saddr varchar (30))
+Teacher (Tno integer, tname varchar (20), qualification char (15), experience integer)
+Relationship:
+Student-Teacher related with many to many relationship with descriptive attribute
+Subject
+Constraints: Primary Key, student and teacher name should not be null.
+Draw ER diagram and Normalization diagram for above relational schema.
+Using above database solve the following questions.
+A. Create a View
+1. To display details of teachers having experience > 5 years.
+2. To display details of teachers whose name start with the letter ‘S’.
+B. Write a function to count the number of the teachers who are teaching to a student named
+‘ ’. (Accept student name as input parameter).
+ANS:
+1) Create table Student (sno int primary key, s_name char(30), s_class char(10), s_addr
+Char(50));
+2) Create table Teacher (tno int primary key, t_name char (20), qualification char
+(15),experience integer);
+3) Create table ST (sno int references Student, tno int references Teacher, subject text);
+
+1. To display details of teachers having experience > 5 years.
+ANS:
+
+2. To display details of teachers whose name start with the letter ‘S’.
+ANS:
+
+B. Write a function to count the number of the teachers who are teaching to a student named
+‘ ’. (Accept student name as input parameter).
+ANS:
+create  or replace function disp_teach(text)
+returns void as'
+declare
+cnt int;
+begin
+select into cnt count(tno) from student,st where student.sno=st.sno  and s_name=$1;
+raise notice ''No. of teachers teaching :=%'',cnt;
+end;'
+language 'plpgsql';
+
+--------------------------------------------------------------------
+function calling:
+----------------------------------------------------
+Lab=# select disp_teach('Ram');
