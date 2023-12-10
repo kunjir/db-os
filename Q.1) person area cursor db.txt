@@ -1,0 +1,45 @@
+Q.1) Create the following database in 3NF using PostgreSQL.
+Consider the following Person–Area database
+Person (pnumber integer, pname varchar (20), birthdate date, income money)
+Area (aname varchar (20), area_type varchar (5))
+An area can have one or more persons living in it, but a person belongs to exactly one area. The
+attribute ‘area_type’ can have values either ‘urban’ or ‘rural’. Create the above database in
+PostgreSQL.
+Draw ER diagram and Normalization diagram for above relational schema.
+Using above database solve the following questions.
+A. Create view
+1. List the names of all people living in ‘ ’ area.
+2. Display person details sorted by person name.
+B. Write a cursor to update the income of all people living in ‘Urban’ area by 10%.
+ANS:
+create table Person (pnumber integer primary key, pname varchar (20), birthdate date, income money,aname varchar(20) references Area);
+-----------------------------------------------------------------------------------------------
+create table Area (aname varchar (20) primary key , area_type varchar (5) check (area_type in ('R','U')));
+
+1. List the names of all people living in ‘ ’ area.
+create view v1 as
+select pname from person where aname='Pimpri';
+
+2. Display person details sorted by person name.
+select * from person order by pname;
+
+B. Write a cursor to update the income of all people living in ‘Urban’ area by 10%.
+create or replace function up_income()
+returns void as'
+declare
+name text;
+c3 cursor for select pname from person,area where person.aname=area.aname and area_type=''U'';
+begin 
+open c3;
+loop
+fetch c3 into name;
+update person set income=income+income*.1 where pname=name;
+exit when not found;
+raise notice '' Record Updated...'';
+end loop;
+close c3;
+end;'
+language 'plpgsql';
+-----------------------------
+Lab=# select up_income();
+NOTICE:   Record Updated...
